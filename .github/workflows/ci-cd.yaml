@@ -1,0 +1,93 @@
+# Ge flödet ett namn
+name: CI/CD Workflow
+
+# Sätt en trigger
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull-request:
+    branches:
+      - main
+  
+
+# Skapa jobb som ska köras
+jobs:
+  unit-test:
+    name: "Run unit Tests"
+    runs-on: ubuntu-latest
+    steps:
+        # Hämta ut koden ifrån repot
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          node-version: 18
+      # Installera dependencies för npm
+      - name: Install Dependencies
+        run: npm install
+      # Kör testerna
+      - name: Run Tests
+        run: npm run test-unit
+
+  # Skapar nästa jobb att köras
+  integration-test:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-test # Kör endast om unittest-jobbet lyckas
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+    
+      - name: Run Tests
+        run: npm run test-integration
+
+  # ui-test:
+  #   name: Run UI Tests
+  #   runs-on: ubuntu-latest
+  #   needs: [unit-test, integration-test]
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         node-version: 18
+
+  #     - name: Install Dependencies
+  #       run: npm install
+
+  #     - name: Install Playwright
+  #       run: npx playwright install
+
+  #     - name: Install System Dependencies
+  #       run: npx playwright install-deps
+
+  #     - name: Run Tests
+  #       run: npm run test-ui
+
+  
+  # deploy:
+  #   name: Deploy to Server
+  #   runs-on: ubuntu-latest
+  #   needs: [unit-test, integration-test] # kör endast om tidigare jobb lyckas
+  #   if: github.ref == 'refs/heads/main' # Kör endast på merge (push) till main
+  #   environment:
+  #     name: production
+  #   steps:
+  #     - name: Deploy Application
+  #       uses: appleboy/ssh-action@v1.2.0
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         password: ${{ secrets.PASSWORD }}
+  #         port: ${{ secrets.PORT }}
+  #         script: |
+  #           cd /srv/www/pvt23-workflow-demo
+  #           git pull
+  #           npm install
+  #           pm2 restart 4
+
