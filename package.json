@@ -4,7 +4,11 @@
   "description": "a demo",
   "main": "index.js",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "test-unit": "npx playwright test tests/mathTest.spec.js",
+    "test-integration": "npx playwright test tests/calculatorTest.spec.js",
+    "test-ui": "npx playwright test tests/uiTest.spec.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
